@@ -1,5 +1,9 @@
 
-function Card() {
+function Card({card}) {
+
+  if (!card) {
+    return null
+  }
 
   return (
     <div>

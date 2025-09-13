@@ -1,11 +1,34 @@
-import { useState } from "react"
+import { useEffect, useState} from "react"
 import GitHub from "./assets/GitHub"
 import Card from "./Card"
 
 function App() {
 
+  // ok mas preciso entender melhor como funciona o processamento do react
+  // junto com o localStorage
+
   // valor atual     definir novo valor
   const [linkValue, setlinkValue] = useState('');
+  const [cards, setCards] = useState([]);
+
+  // aqui ele guarda os cards salvos quando recarregar a aplicaçãp
+  useEffect(() => {
+    const savedCards = localStorage.getItem("cards")
+    if (savedCards) {
+      setCards(JSON.parse(savedCards))
+    }
+  }, [])
+  // roda 1 vez quando o componente monta pela primeira vez
+  
+  // aqui ele salva o card toda vez que a lista de cards passa por mudanças
+  useEffect(() => {
+    console.log(cards)
+    if (cards.length > 0) {
+      localStorage.setItem("cards", JSON.stringify(cards))
+  }
+
+  }, [cards])
+  // roda toda vez que cards mudar
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -28,15 +51,16 @@ function App() {
       const data = await response.json()
 
       console.log(data)
+      setCards(prevCards => [...prevCards, data])
     } catch (error) {
       console.log("Ocorreu um erro: ", error)
     }
-  } 
+  }
 
   return (
-    <div className="flex flex-col items-center h-screen bg-blue-400">
+    <div className="flex flex-col items-center min-h-screen bg-blue-400">
 
-      <div className="flex flex-col items-center w-1/2 h-auto m-10 p-10 rounded-lg overflow-hidden bg-orange-400">
+      <div className="flex flex-col items-center w-1/2 h-auto m-10 p-10 rounded-lg bg-orange-400">
         
         <GitHub> </GitHub>
         <h1 className="text-lg font-extrabold m-5"> My favorite GitHub repositories </h1>
@@ -54,12 +78,9 @@ function App() {
         </form>
 
         <div className="grid grid-cols-3 gap-5 m-10 w-full">
-          <Card> </Card>
-          <Card> </Card> 
-          <Card> </Card> 
-          <Card> </Card> 
-          <Card> </Card>
-          <Card> </Card> 
+          {cards.map((card, index) =>
+            <Card key={index} card={card}> </Card>
+          )}
         </div>
         
       </div>
